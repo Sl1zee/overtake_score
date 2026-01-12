@@ -241,7 +241,7 @@ local speedWarning = 0
            end
        end
 
-        ui.beginTransparentWindow("overtakeScore", vec2(100, 100), vec2(400, 400))
+        ui.beginTransparentWindow("overtakeScore", vec2(100, 100), vec2(600, 450))
         ui.beginOutline()
 
         ui.pushStyleVar(ui.StyleVar.Alpha, 1 - speedWarning)
@@ -294,6 +294,7 @@ local speedWarning = 0
         ui.endTransparentWindow()
 
     end
+
 
 
 
