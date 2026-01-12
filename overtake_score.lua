@@ -16,7 +16,7 @@
 -- • Remote future: control scene, AIs, spawn extra geometry and so on.
 
 -- Event configuration:
-local requiredSpeed = 80
+local requiredSpeed = 200
 
 
 -- This function is called before event activates. Once it returns true, it’ll run:
@@ -285,4 +285,5 @@ local speedWarning = 0
         ui.popStyleVar()
 
         ui.endTransparentWindow()
+
     end
