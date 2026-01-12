@@ -16,13 +16,13 @@
 -- • Remote future: control scene, AIs, spawn extra geometry and so on.
 
 -- Event configuration:
-local requiredSpeed = 200
-local meterStartSpeed = 150
+local requiredSpeed = 150
+local meterStartSpeed = 100
 
 -- This function is called before event activates. Once it returns true, it’ll run:
 function script.prepare(dt)
     ac.debug("speed", ac.getCarState(1).speedKmh)
-    return ac.getCarState(1).speedKmh > 150
+    return ac.getCarState(1).speedKmh > 100
 end
 
 -- Event state:
@@ -53,7 +53,7 @@ function script.update(dt)
 
     timePassed = timePassed + dt
 
-    local comboFadingRate = 0.5 * math.lerp(1, 0.1, math.lerpInvSat(player.speedKmh, 150, 200)) + player.wheelsOutside
+    local comboFadingRate = 0.5 * math.lerp(1, 0.1, math.lerpInvSat(player.speedKmh, 150, 270)) + player.wheelsOutside
     comboMeter = math.max(1, comboMeter - dt * comboFadingRate)
 
     local sim = ac.getSimState()
@@ -225,7 +225,7 @@ local speedWarning = 0
             rgbm.new(hsv(comboColor, math.saturate(comboMeter / 10), 1):rgb(), math.saturate(comboMeter / 4))
 
         local function speedMeter(ref)
-          local w = 180
+          local w = 100
 
            local function xFromSpeed(s)
              return w * math.lerpInvSat(s, meterStartSpeed, requiredSpeed)
@@ -294,6 +294,7 @@ local speedWarning = 0
         ui.endTransparentWindow()
 
     end
+
 
 
 
