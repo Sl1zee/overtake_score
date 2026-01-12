@@ -17,7 +17,7 @@
 
 -- Event configuration:
 local requiredSpeed = 200
-
+local meterStartSpeed = 150
 
 -- This function is called before event activates. Once it returns true, it’ll run:
 function script.prepare(dt)
@@ -53,7 +53,7 @@ function script.update(dt)
 
     timePassed = timePassed + dt
 
-    local comboFadingRate = 0.5 * math.lerp(1, 0.1, math.lerpInvSat(player.speedKmh, 200, 270)) + player.wheelsOutside
+    local comboFadingRate = 0.5 * math.lerp(1, 0.1, math.lerpInvSat(player.speedKmh, 150, 200)) + player.wheelsOutside
     comboMeter = math.max(1, comboMeter - dt * comboFadingRate)
 
     local sim = ac.getSimState()
@@ -214,8 +214,9 @@ local speedWarning = 0
         local uiState = ac.getUiState()
         updateMessages(uiState.dt)
 
-        local speedRelative = math.saturate(math.floor(ac.getCarState(1).speedKmh) / requiredSpeed)
-        speedWarning = math.applyLag(speedWarning, speedRelative < 1 and 1 or 0, 0.5, uiState.dt)
+        local speedKmh = ac.getCarState(1).speedKmh
+        local speedRelative = math.saturate((speedKmh - meterStartSpeed) / (requiredSpeed - meterStartSpeed))
+        speedWarning = math.applyLag(speedWarning, speedKmh < requiredSpeed and 1 or 0, 0.5, uiState.dt)
 
         local colorDark = rgbm(0.4, 0.4, 0.4, 1)
         local colorGrey = rgbm(0.7, 0.7, 0.7, 1)
@@ -224,15 +225,21 @@ local speedWarning = 0
             rgbm.new(hsv(comboColor, math.saturate(comboMeter / 10), 1):rgb(), math.saturate(comboMeter / 4))
 
         local function speedMeter(ref)
-            ui.drawRectFilled(ref + vec2(0, -4), ref + vec2(180, 5), colorDark, 1)
-            ui.drawLine(ref + vec2(0, -4), ref + vec2(0, 4), colorGrey, 1)
-            ui.drawLine(ref + vec2(requiredSpeed, -4), ref + vec2(requiredSpeed, 4), colorGrey, 1)
+          local w = 180
 
-            local speed = math.min(ac.getCarState(1).speedKmh, 180)
-            if speed > 1 then
-                ui.drawLine(ref + vec2(0, 0), ref + vec2(speed, 0), colorAccent, 4)
-            end
-        end
+           local function xFromSpeed(s)
+             return w * math.lerpInvSat(s, meterStartSpeed, requiredSpeed)
+           end
+
+           ui.drawRectFilled(ref + vec2(0, -4), ref + vec2(w, 5), colorDark, 1)
+           ui.drawLine(ref + vec2(0, -4), ref + vec2(0, 4), colorGrey, 1)
+           ui.drawLine(ref + vec2(w, -4), ref + vec2(w, 4), colorGrey, 1)
+
+           local x = xFromSpeed(ac.getCarState(1).speedKmh)
+           if x > 0 then
+               ui.drawLine(ref + vec2(0, 0), ref + vec2(x, 0), colorAccent, 4)
+           end
+       end
 
         ui.beginTransparentWindow("overtakeScore", vec2(100, 100), vec2(400 * 0.5, 400 * 0.5))
         ui.beginOutline()
@@ -287,4 +294,5 @@ local speedWarning = 0
         ui.endTransparentWindow()
 
     end
+
 
